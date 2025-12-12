@@ -1,7 +1,8 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <Adafruit_SSD1306.h>
-#include "wifiConfig.h"
+#include "config.h"
+#include "wifiManager.h"
 
 //Configuracion del Display 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -13,9 +14,25 @@
 #define OLED_SCL 12         // D6
 Adafruit_SSD1306 display(SCREEN_WIDTH,SCREEN_HEIGHT,&Wire);
 
+bool wifiConectado = false; 
 
+void onWifiConnect(const WiFiEventStationModeGotIP& event){
+  Serial.println("Conexion Exitosa"); 
+  wifiConectado = true; 
+}
 
 void wifiSetUp(){ 
+  /*
+  1º Intentar conexion
+    si fallo en conexion -> preguntar scan
+  */
+
+  /*WiFi.mode(WIFI_STA); 
+  WiFi.scanNetworksAsync(); //Cuando termina ejecuta el metodo
+  */
+ 
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD); 
+  WiFi.onStationModeGotIP(onWifiConnect);
 
 }
 
@@ -29,15 +46,21 @@ void displaySetUp(){
 }
 
 void setup() { 
-
+  displaySetUp(); 
+  wifiSetUp(); 
 }
 
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+  display.clearDisplay(); 
+  if(wifiConectado){ 
+    display.println("Conexion realizada"); 
+    display.display();
+  } else { 
+    display.println("Intentando conectar");
+    display.display(); 
+  }
+  delay(500); 
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+
 }
