@@ -1,11 +1,15 @@
 #include "wifiManager.h"
 #include <ESP8266WiFi.h>
+#include <EEPROM.h>
 
 
-WifiManager::WifiManager(const char* ssid, const char* password){ 
-    this->ssid = ssid; 
-    this->password = password; 
+WifiManager::WifiManager()
+    : credentialsValid(false) {
+    ssid[0] = '\0';
+    password[0] = '\0';
 }
+
+
 
 void WifiManager::setup(){ 
     //Inicializar handlers
@@ -15,18 +19,21 @@ void WifiManager::setup(){
 
     disconneted = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& event){
         setStatus(); 
+        
     }); 
 
     WiFi.mode(WIFI_STA); //Modo por defecto STA 
     WiFi.begin(ssid, password); //Se intenta conectar
-    //Implementacion de espera ocupada + timeout para comprobar su funcionalida
-    unsigned long timeout = 30000;  
+    
+    unsigned long timeout = 30000; //30" para establecer conexione  
     WiFi.waitForConnectResult(timeout); 
 
     setStatus(); 
 }
 
-wl_status_t WifiManager::getStatus(){ 
+
+//Getters & Setters
+wl_status_t WifiManager::getStatus() const { 
     return status;  
 }
 
