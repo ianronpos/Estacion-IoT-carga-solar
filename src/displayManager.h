@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <Adafruit_SSD1306.h>
+#include "WifiEvents.h"
 
 #define OLED_RESET     -1   // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C 
@@ -10,7 +11,7 @@
 #define OLED_SCL 12         // D6
 
 
-class DisplayManager{ 
+class DisplayManager : public WifiEvents{ 
 
     private: 
         static constexpr uint8_t SCREEN_WIDTH = 128; 
@@ -18,10 +19,15 @@ class DisplayManager{
 
         Adafruit_SSD1306 display; 
 
-    public: 
+    public:
         DisplayManager(); 
-        void setup(); 
+        ~DisplayManager() override = default; 
+        void setup();  
         void testDisplay(); 
+
+        void onWifiConnect(const WifiInfo& info) override; 
+        void onWifiDisconnect(const WifiInfo& info) override;    
+
 
 }; 
 
