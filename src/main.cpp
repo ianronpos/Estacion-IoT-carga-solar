@@ -1,5 +1,5 @@
 #include "config.h"
-#include "wifiManager.h"
+#include "NetworkManager.h"
 #include "displayManager.h"
 #include "inaDriver.h"
 #include <Arduino.h>
@@ -7,7 +7,7 @@
 #include <Adafruit_SSD1306.h>
  
 DisplayManager displayManager; 
-WifiManager wifi;
+NetworkManager wifi;
 
 void setup() { 
   Serial.begin(115200); 
@@ -16,13 +16,13 @@ void setup() {
   wifi.setListner(&displayManager); //Tiene que llamarse antes que el wifi.setup() ya que este crea eventos con el listener 
   displayManager.setup(); 
   wifi.setup(); 
-
+  wifi.tryConnect(); 
 }
 
 
 void loop() { 
-  Serial.println(wifi.getStatus()); 
+  Serial.print("Estado de la conexion: ");
+  Serial.println(wifi.getStatus());  
   wifi.loop(); 
   delay(500);
-
 }

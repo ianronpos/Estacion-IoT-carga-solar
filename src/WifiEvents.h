@@ -6,9 +6,8 @@
 
 struct WifiInfo{
     IPAddress ip;
-    const char* ssid; 
-    int rssi; 
-    WiFiDisconnectReason disconnectReason;
+    String ssid; 
+    uint8_t status;
 };
 
 
@@ -16,6 +15,7 @@ class WifiEvents{
     public: 
         virtual void onWifiConnect(const WifiInfo& info) = 0; 
         virtual void onWifiDisconnect(const WifiInfo& info) = 0; 
+        virtual void wifiAp(String ssid, uint8_t error) = 0; 
         
         virtual ~WifiEvents() = default; //Destructor 
 };

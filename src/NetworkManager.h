@@ -1,11 +1,12 @@
-#ifndef WIFIMANAGER_H
-#define WIFIMANAGER_H
+#ifndef NETWORKMANAGER_H
+#define NETWORKMANAGER_H
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include <WiFiManager.h>
 #include "WifiEvents.h"
 
-class WifiManager { 
+class NetworkManager { 
     private: 
         WifiEvents* listener; 
         WifiInfo info; 
@@ -16,14 +17,15 @@ class WifiManager {
         
         //Event Handlers 
         WiFiEventHandler gotIpEventHandler;
-        WiFiEventHandler disconneted; 
+        WiFiEventHandler disconnetedEventHandler; 
+        WiFiEventHandler connectedEventHandler; 
 
     public: 
         
         /**
-         * @brief Construye un objeto WifiManager, con valores predeterminado
+         * @brief Construye un objeto NetworkManager, con valores predeterminado
         */
-        WifiManager();  
+        NetworkManager();  
         
                 
         /**
@@ -68,16 +70,28 @@ class WifiManager {
          * |   4    | WL_CONNECT_FAILED    | Fallo general         |
          * |   6    | WL_WRONG_PASSWORD    | Contraseña incorrecta |
          * |   7    | WL_DISCONNECTED      | Desconectado          |
-         * * Para ver el diagrama completo (si VS Code lo permite):
-         * [Ver Diagrama en docs](../docs/Codigos_wl_status.png)
+         * * Para ver el diagrama completo :
+         * https://github.com/ianronpos/Estacion-IoT-carga-solar/blob/main/docs/Codigos_wl_status.png
          * * @return wl_status_t Estado actual.
          */
-        wl_status_t getStatus() const; 
+        uint8_t getStatus() const; 
       
         /**
          * @brief Actualiza el estado de la conexion
          */
         void updateState(); 
+
+        /**
+         * @brief Obtiene la info de especifica de WifiInfo 
+         * 
+         * @tparam T 
+         * @param field 
+         * @return T 
+         */
+        template <typename T>
+        T getInfoField(T WifiInfo::*field) {
+            return info.*field;
+        }
 }; 
 
 #endif
