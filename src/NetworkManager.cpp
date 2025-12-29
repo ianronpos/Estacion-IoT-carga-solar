@@ -48,7 +48,7 @@ void NetworkManager::tryConnect(){
             listener->wifiAp(ssid, info.status);
         }
     }); 
-    if(!wm.autoConnect("EspAP", "yan13052006")){ 
+    if(!wm.autoConnect(APName, APPassword)){ 
         Serial.println("error de conexion"); 
         ESP.restart(); 
     } 

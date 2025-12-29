@@ -34,6 +34,10 @@ void DisplayManager::onWifiConnect(const WifiInfo& info){
   display.display(); 
 }
 
+
+//=================================================================================================================================================
+//TODO: SER MAS ESPECIFICO CON EL POR QUE DEL ERROR
+//=================================================================================================================================================
 void DisplayManager::onWifiDisconnect(const WifiInfo& info){ 
   display.clearDisplay();
   display.setCursor(0,0); 

@@ -1,13 +1,21 @@
 #ifndef CONFIGTEMPLATE_H
 #define CONFIGTEMPLATE_H
 
-// Aqui defines las credenciales de la red wifi a la que se conectara el esp
-#define WIFI_SSID "Nombre de la red"
-#define WIFI_PASSWORD "Contraseña de dicha red"
+#include <Arduino.h>
 
-// Aqui van los datos del servicio MQTT al que te conectas 
-#define MQTT_SERVER "dirieccion IP" 
-#define MQTT_USER "usuario_mqtt"
-#define MQTT_PASS "clave_mqtt"
+//Tiempo que trascurre desde que se crea el AP desde que falla la conexion hasta que se reinicia
+static constexpr int APTimeout = 180; 
+
+constexpr const char* APPassword = "tu contraseña, minimo 8 caracter"; 
+constexpr const char* APName = "El nombre del AP que se creara cuando se inicie por primera vez";
+
+//Structura que guarda informacion para la conexion MQTT 
+struct Configuracion{ 
+    String mqttServer;
+    int mqttPort;
+    String mqttUser;
+    String mqttPassword;
+    String mqttTopic;
+}; 
 
 #endif
