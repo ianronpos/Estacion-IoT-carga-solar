@@ -9,13 +9,4 @@ static constexpr int APTimeout = 180;
 constexpr const char* APPassword = "tu contraseña, minimo 8 caracter"; 
 constexpr const char* APName = "El nombre del AP que se creara cuando se inicie por primera vez";
 
-//Structura que guarda informacion para la conexion MQTT 
-struct Configuracion{ 
-    String mqttServer;
-    int mqttPort;
-    String mqttUser;
-    String mqttPassword;
-    String mqttTopic;
-}; 
-
 #endif
