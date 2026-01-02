@@ -34,14 +34,19 @@ void DisplayManager::onWifiConnect(const WifiInfo& info){
   display.display(); 
 }
 
-
-//=================================================================================================================================================
-//TODO: SER MAS ESPECIFICO CON EL POR QUE DEL ERROR
-//=================================================================================================================================================
 void DisplayManager::onWifiDisconnect(const WifiInfo& info){ 
   display.clearDisplay();
   display.setCursor(0,0); 
-  display.println(info.status); 
+  display.print("Desconectado por: "); 
+  if(info.status == 1){ 
+    display.println("SSID guardada no disponible");
+  } else if(info.status == 6){ 
+    char buff [32]; 
+    sniprintf(buff, sizeof(buff), "Contraseña de %s incorrecta", info.ssid.c_str()); 
+    display.println(buff); 
+  } else { 
+    display.println("Estado desconecatado");
+  }
   display.display(); 
 }
 

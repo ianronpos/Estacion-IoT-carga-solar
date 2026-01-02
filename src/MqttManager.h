@@ -2,15 +2,32 @@
 #define MQTTMANAGER_H
 
 #include <Arduino.h>
+#include <PubSubClient.h>
+#include <ESP8266WiFi.h>
 
 struct MqttConfig{ 
-    String mqttServer;
+    const char* mqttServer;
     int mqttPort;
-    String mqttUser;
-    String mqttPassword;
-    String mqttTopic;
+    const char* mqttUser;
+    const char* mqttPassword;
+    const char* mqttTopic;
 }; 
 
+class MqttManager{
+    private: 
+        WiFiClient wlanClient; 
+        PubSubClient client; 
+        MqttConfig config; 
+
+    public: 
+        MqttManager(); 
+        void setup(MqttConfig& config); 
+        void loop(); 
+        bool publish(unsigned long timestap, double potency, double voltage); 
+        int8_t isConnected(); 
+        //getLastError
+
+}; 
 
 
 #endif

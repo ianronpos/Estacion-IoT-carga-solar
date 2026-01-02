@@ -2,20 +2,24 @@
 #include <LittleFS.h>
 #include <ArduinoJson.h>
 
-bool StorageManager::begin(){ 
+bool StorageManager::begin(){
+    bool res = false; 
     if(!LittleFS.begin()){ //Si no se puede arrancar el sistema de archivos
         Serial.println("Error al arrancar el Sistema de archivos littleFS. Probando formateo..."); 
        
         if(!format()){ 
             Serial.println("No se ha podido formatear el sistema de archivos"); 
-            return false; 
+            res = false; 
+        } else { 
+            if(!LittleFS.begin()){ 
+                Serial.println("No se ha podido montar incluso despues de formateo"); 
+                res = false; 
+            } else{
+                //No hace falta comprobar que existe por que se ha formateado previamente el sistema de archivos 
+                createDefaultConfig(); 
+                res = true; 
+            }
         }
-
-        if(!LittleFS.begin()){ 
-            Serial.println("No se ha podido montar incluso despues de formateo"); 
-            return false; 
-        }
-
     } else { 
         Serial.println("Sistema de archivos cargado correctamente"); 
 
@@ -23,8 +27,9 @@ bool StorageManager::begin(){
             Serial.println("No se encontro el archivo de configuracion"); 
             createDefaultConfig(); 
         }
+        res = true; 
     }
-    //TODO: COMPROBAR SI LOS ULTIMOS DATOS SE HAN ENVIADO Y BORRARLOS
+    return res; 
 }
 
 bool StorageManager::format(){ 
@@ -44,7 +49,7 @@ bool StorageManager::format(){
     return true; 
 }
 
-void StorageManager::saveMeasure(unsigned long timestamp, double value){
+void StorageManager::saveMeasure(unsigned long timestamp, double potency, double voltage){
     //Abrimos el archivo en modo append, si no existe, se crea 
     File file = LittleFS.open("/log.csv", "a"); 
 
@@ -53,8 +58,8 @@ void StorageManager::saveMeasure(unsigned long timestamp, double value){
         return; 
     }
 
-    //Añadimos timestamp,value\n 
-    file.printf("%ul,%d\n", timestamp, value); 
+    //Añadimos cabecera
+    file.printf("%lu,%.2f,%.2f\n", timestamp, potency, voltage); 
 
     file.close(); 
 }
@@ -96,7 +101,8 @@ File StorageManager::openTempFile(){
 
 String StorageManager::getNextLine(File& file){ 
     if(!file.available()){
-        return; 
+        Serial.println("El archivo no esta disponible"); 
+        return String((char*)NULL);  
     } else { 
         String res = file.readStringUntil('\n'); 
         return res; 

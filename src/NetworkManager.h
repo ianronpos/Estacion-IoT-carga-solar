@@ -34,12 +34,6 @@ class NetworkManager {
          */
         void setListner(WifiEvents* listener);         
 
-        //Funciones para cargar en memoria
-        //TODO: Implementar las funciones
-        bool saveCredentials(); 
-        bool loadCredentials();
-        bool hasCredentials() const; 
-
         /**
          * @brief Inicializa los events handler
          */

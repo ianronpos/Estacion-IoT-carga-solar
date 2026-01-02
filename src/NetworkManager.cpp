@@ -70,10 +70,12 @@ void NetworkManager::loop() {
             break;
 
             case WL_WRONG_PASSWORD: //Codigo 6
+            listener->onWifiDisconnect(info); 
             tryConnect(); 
             break;    
             
             case WL_NO_SSID_AVAIL: //Codigo 1
+            listener->onWifiDisconnect(info); 
             tryConnect(); 
             break; 
 

@@ -2,7 +2,7 @@
 #define STORAGEMANAGER_H
 
 #include <LittleFS.h>
-#include "config.h"
+#include "MqttManager.h"
 
 
 class StorageManager { 
@@ -21,7 +21,10 @@ class StorageManager {
      */
     bool format(); 
 
-    void loadConfig(const Configuracion& configuracion); 
+    //=============================================================================================================================
+    //Implementar
+    //=============================================================================================================================
+    void loadConfig(const MqttConfig& configuracion); 
     
     /**
      * @brief Crea el archivo config.json con los valores por defecto
@@ -32,9 +35,10 @@ class StorageManager {
      * @brief Guarda la medida en /log.csv
      * 
      * @param timestamp identifica cuando se tomo la medida 
-     * @param value valor de la medida
+     * @param potency valor de la potencia 
+     * @param voltage valor del voltaje
      */
-    void saveMeasure(unsigned long timestamp, double value); 
+    void saveMeasure(unsigned long timestamp, double potency, double voltage); 
     
     /**
      * @brief Revisa si /log.csv contiene informacion, si contiene informacion es que esta pendiente
