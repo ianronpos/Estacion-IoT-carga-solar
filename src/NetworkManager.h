@@ -6,6 +6,10 @@
 #include <WiFiManager.h>
 #include "WifiEvents.h"
 
+//Tiempo que trascurre desde que se crea el AP desde que falla la conexion hasta que se reinicia
+static constexpr int APTimeout = 180; 
+
+
 class NetworkManager { 
     private: 
         WifiEvents* listener; 
@@ -14,42 +18,19 @@ class NetworkManager {
         char ssid [33];
         char password [65];
         wl_status_t status; 
-        
+        ApInfo apInfo; 
+
         //Event Handlers 
         WiFiEventHandler gotIpEventHandler;
         WiFiEventHandler disconnetedEventHandler; 
         WiFiEventHandler connectedEventHandler; 
 
     public: 
-        
-        /**
-         * @brief Construye un objeto NetworkManager, con valores predeterminado
-        */
         NetworkManager();  
-        
-                
-        /**
-         * @brief Asigna el valor ptr al puntero listener
-         * @param ptr 
-         */
-        void setListner(WifiEvents* listener);         
-
-        /**
-         * @brief Inicializa los events handler
-         */
-        void setup();
-        
-        /**
-         * @brief Intenta conectarse segun las credenciales que tiene guardadas
-         */
-        void tryConnect();
-
+        void setListner(WifiEvents* listener);        
+        void setup(const ApInfo& apInfo);
+        void tryConnect(); 
         void scan(); 
-
-                
-        /**
-         * @brief loop principal de Manager, comprueba estados... 
-        */
         void loop(); 
         
         /**
@@ -69,10 +50,6 @@ class NetworkManager {
          * * @return wl_status_t Estado actual.
          */
         uint8_t getStatus() const; 
-      
-        /**
-         * @brief Actualiza el estado de la conexion
-         */
         void updateState(); 
 
         /**

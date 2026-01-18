@@ -12,21 +12,29 @@ DisplayManager displayManager;
 NetworkManager wifi;
 StorageManager storage; 
 MqttManager mqtt; 
+InaDriver ina; 
 
 void setup() { 
   Serial.begin(115200); 
 
+  if(!ina.setup()){ 
+    displayManager.displayText("Error al encontrar el sensor INA219"); 
+    while (true) {}
+  }
 
   wifi.setListner(&displayManager); //Tiene que llamarse antes que el wifi.setup() ya que este crea eventos con el listener 
   displayManager.setup(); 
-  wifi.setup(); 
-  wifi.tryConnect(); 
+  wifi.setup(storage.getApInfo()); 
+  storage.setup(); 
+  wifi.tryConnect();
+  mqtt.setup();  
 }
 
 
 void loop() { 
   wifi.loop(); 
-  
-  
-  delay(500);
+  mqtt.loop(); 
+  ina.loop(); 
+  storage.saveMeasure(ina.getPower(), ina.getVoltage()); 
+  delay(50);
 }

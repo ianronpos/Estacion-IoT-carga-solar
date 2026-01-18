@@ -63,3 +63,21 @@ void DisplayManager::wifiAp(String ssid, uint8_t error){
   display.println(buff); 
   display.display(); 
 }
+
+void DisplayManager::displayText(const char*  text){ 
+  display.clearDisplay(); 
+  display.setCursor(0,0); 
+  char buff [64]; 
+  snprintf(buff, sizeof(buff),  text); 
+  display.println(buff); 
+  display.display(); 
+}
+
+void DisplayManager::displayText(String text){ 
+  display.clearDisplay(); 
+  display.setCursor(0,0); 
+  char buff [64]; 
+  snprintf(buff, sizeof(buff),  text.c_str()); 
+  display.println(buff); 
+  display.display(); 
+}

@@ -3,19 +3,15 @@
 #include <EEPROM.h>
 #include "WifiEvents.h"
 #include "config.h"
+#include "StorageManager.h"
 
-
-
-//=================================================================================================================================================
-//TODO: REVISAR POR QUE CUANDO FALLA LA CONTRASEÑA NO INDICA EL ERROR EN DISPLAY
-//=================================================================================================================================================
 NetworkManager::NetworkManager()
     : listener(nullptr), credentialsValid(false) {
     ssid[0] = '\0';
     password[0] = '\0';
 }
 
-void NetworkManager::setup(){
+void NetworkManager::setup(const ApInfo& apInfo){
     //Inicializar handlers
     gotIpEventHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& event){ 
         //INICIAR MQTT <- IMPORTATNTE, aqui se tiene que avisar de que ya existe conexion para iniciar MQTT, si no -> kernell panic
@@ -32,6 +28,8 @@ void NetworkManager::setup(){
     connectedEventHandler = WiFi.onStationModeConnected([this] (const WiFiEventStationModeConnected& event){
         updateState(); 
     });
+
+    this->apInfo = apInfo; 
 }  
 
 void NetworkManager::tryConnect(){ 
@@ -67,6 +65,7 @@ void NetworkManager::loop() {
 
             case WL_DISCONNECTED: //Codigo 7
             listener->onWifiDisconnect(info); 
+            tryConnect();
             break;
 
             case WL_WRONG_PASSWORD: //Codigo 6

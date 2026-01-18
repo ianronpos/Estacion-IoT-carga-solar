@@ -4,6 +4,7 @@
 #include <IPAddress.h>
 #include <ESP8266WiFi.h>
 
+
 struct WifiInfo{
     IPAddress ip;
     String ssid; 

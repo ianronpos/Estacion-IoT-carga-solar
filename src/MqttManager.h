@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include <PubSubClient.h>
 #include <ESP8266WiFi.h>
+#include <Ticker.h>
+#include "ITransmisor.h"
 
 struct MqttConfig{ 
     String mqttServer;
@@ -13,61 +15,25 @@ struct MqttConfig{
     String mqttTopic;
 }; 
 
-class MqttManager{
+class MqttManager : public ITransmisor{
     private: 
         WiFiClient wlanClient; 
         PubSubClient client; 
         MqttConfig config; 
         String espId; 
         unsigned long lastReconnectAttemp; 
+        Ticker ticker; 
+        volatile bool mqttWatcher; 
+
+        static void IRAM_ATTR interruption(MqttManager* pThis);
 
     public: 
-        /**
-         * @brief Contructor, crea la configuracion en funcion del config.h
-         */
-        MqttManager(); 
-
-        /**
-         * @brief Configura la conexion e intenta iniciarla
-         */
+        MqttManager();
         void setup(); 
- 
-
-        /**
-         * @brief Intenta recuperar la conexion mqtt
-         */
         void reconnect();
-        
-        /**
-         * @brief compruba si hay conexion
-         * 
-         * @return true 
-         * @return false 
-         */
         bool isConnected(); 
-
-        /**
-         * @brief devuelve el estado de la conexion mqtt
-         * 
-         * @return int8_t 
-         */
         int8_t getConnectionStatus(); 
-
-           /**
-         * @brief envia los datos en formato json 
-         * 
-         * @param timestap timestap de cuando se hace la medida
-         * @param potency potencia medida
-         * @param voltage voltaje medido 
-         * @return true si se envio de forma correcta 
-         * @return false si no se envio de forma correcta
-         */
-        bool publish(unsigned long timestap, double potency, double voltage); 
-
-        /**
-         * @brief 
-         * 
-         */
+        bool publish(JsonDocument& doc) override;
         void loop();
 
 }; 

@@ -14,6 +14,7 @@ MqttManager::MqttManager(){
 }
 
 void MqttManager::setup(){ 
+    mqttWatcher = false; 
     client.setClient(wlanClient); 
     client.setBufferSize(512); //Cambia el tamaño del buffer para poder enviar json
     client.setServer(config.mqttServer.c_str(), config.mqttPort); 
@@ -22,6 +23,7 @@ void MqttManager::setup(){
     }  else { 
         Serial.println("No se pudo conectar mqtt"); 
     }
+    ticker.attach_ms(2200, interruption, this); 
 }
 
 void MqttManager::reconnect(){ 
@@ -40,15 +42,9 @@ int8_t MqttManager::getConnectionStatus(){
     return client.state(); 
 }
 
-bool MqttManager::publish(unsigned long timestamp, double potency, double voltage){ 
-    JsonDocument doc; 
-
-    //Añadiendo los valores 
-    doc["timestamp"] = timestamp;
-    doc["potencia"] = potency;  
-    doc["voltaje"] = voltage; 
-
-    char buff[256]; 
+bool MqttManager::publish(JsonDocument& doc){
+    
+    char buff[512]; 
     serializeJson(doc, buff); //pone el archivo como cadena de caracteres en buff
     
     //envia los datos al topico indicado
@@ -56,14 +52,21 @@ bool MqttManager::publish(unsigned long timestamp, double potency, double voltag
 }
 
 void MqttManager::loop(){ 
-    if(!client.connected()){ 
-        unsigned long now = millis(); 
+    if(mqttWatcher){
+        if(!client.connected()){ 
+            unsigned long now = millis(); 
 
-        if(now - lastReconnectAttemp >= 5000){ 
-            lastReconnectAttemp = now; 
-            reconnect(); 
+            if(now - lastReconnectAttemp >= 5000){ 
+                lastReconnectAttemp = now; 
+                reconnect(); 
+            }
+        } else{ 
+            client.loop(); //Mantiene activa la conexion
         }
-    } else{ 
-        client.loop(); //Mantiene activa la conexion
+        mqttWatcher = false;
     }
+}
+
+void MqttManager::interruption(MqttManager* pThis){ 
+    pThis->mqttWatcher = true; 
 }

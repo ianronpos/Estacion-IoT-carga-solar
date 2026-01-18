@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <Adafruit_SSD1306.h>
 #include "WifiEvents.h"
-#include <Ticker.h>
 
 #define OLED_RESET     -1   // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C 
@@ -21,42 +20,15 @@ class DisplayManager : public WifiEvents{
 
 
     public:
-        /**
-         * @brief Construct a new Display Manager object
-         * 
-         */
         DisplayManager(); 
         ~DisplayManager() override = default; 
         
-        /**
-         * @brief Inicia configura la pantalla para su uso
-         * 
-         */
-        void setup();  
-
-        /**
-         * @brief conexion correcta, muestra la ssid y la ip 
-         * 
-         * @param info estructura con informacion sobre la ssid y la ip
-         */
-        void onWifiConnect(const WifiInfo& info) override; 
-
-        /**
-         * @brief 
-         * 
-         * @param info Structura con informacion del error 
-         */
-        void onWifiDisconnect(const WifiInfo& info) override;   
-        
-        /**
-         * @brief Muestra por que no se ha podido conectar a la red wifi guardada e indica su ssid
-         * 
-         * @param ssid nombre de la red que crea  
-         * @param error codigo del estado del dispositivo
-         */
         void wifiAp(String ssid, uint8_t error) override; 
-
+        void displayText(String text); 
+        void displayText(const char*  text); 
+        void setup();  
+        void onWifiConnect(const WifiInfo& info) override; 
+        void onWifiDisconnect(const WifiInfo& info) override;   
 }; 
-
 
 #endif
