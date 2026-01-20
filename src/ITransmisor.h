@@ -5,9 +5,10 @@
 #include <ArduinoJson.h>
 
 class ITransmisor{
-    private:
-        
+    private: 
+
     public:
+        virtual void loadMqttConfig(String server, int port, String user,  String password, String topic) = 0;  
         virtual bool publish(JsonDocument& doc) = 0; 
         virtual ~ITransmisor() = default;
 };

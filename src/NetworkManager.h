@@ -5,13 +5,15 @@
 #include <ESP8266WiFi.h>
 #include <WiFiManager.h>
 #include "WifiEvents.h"
+#include "StorageManager.h"
 
 //Tiempo que trascurre desde que se crea el AP desde que falla la conexion hasta que se reinicia
-static constexpr int APTimeout = 180; 
+
 
 
 class NetworkManager { 
     private: 
+        static constexpr int APTimeout = 180; 
         WifiEvents* listener; 
         WifiInfo info; 
         bool credentialsValid; 

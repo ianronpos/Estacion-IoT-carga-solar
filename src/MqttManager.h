@@ -28,12 +28,13 @@ class MqttManager : public ITransmisor{
         static void IRAM_ATTR interruption(MqttManager* pThis);
 
     public: 
-        MqttManager();
+        MqttManager();  
         void setup(); 
-        void reconnect();
+        void reconnect(); 
         bool isConnected(); 
         int8_t getConnectionStatus(); 
-        bool publish(JsonDocument& doc) override;
+        void loadMqttConfig(String server, int port, String user,  String password, String topic) override; 
+        bool publish(JsonDocument& doc) override; 
         void loop();
 
 }; 

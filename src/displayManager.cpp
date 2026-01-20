@@ -1,7 +1,6 @@
 #include "displayManager.h"
 #include <Adafruit_SSD1306.h>
 #include <Ticker.h>
-#include "config.h"
   
 DisplayManager::DisplayManager()
     : display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET) {

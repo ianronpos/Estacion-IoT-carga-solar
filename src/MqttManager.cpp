@@ -1,15 +1,9 @@
 #include "MqttManager.h"
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
-#include <config.h>
 #include <ArduinoJson.h>
 
 MqttManager::MqttManager(){ 
-    config.mqttServer = MQTT_SERVER; 
-    config.mqttPort = MQTT_PORT; 
-    config.mqttUser = MQTT_USER;
-    config.mqttPassword = MQTT_PASSWORD; 
-    config.mqttTopic = MQTT_TOPIC; 
     espId = "Esp8266_" + WiFi.macAddress(); 
 }
 
@@ -65,6 +59,14 @@ void MqttManager::loop(){
         }
         mqttWatcher = false;
     }
+}
+
+void MqttManager::loadMqttConfig(String server, int port, String user,  String password, String topic){
+    config.mqttServer = server; 
+    config.mqttPort = port; 
+    config.mqttUser = user;
+    config.mqttPassword = password; 
+    config.mqttTopic = topic; 
 }
 
 void MqttManager::interruption(MqttManager* pThis){ 

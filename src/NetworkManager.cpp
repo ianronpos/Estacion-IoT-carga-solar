@@ -2,7 +2,6 @@
 #include <ESP8266WiFi.h>
 #include <EEPROM.h>
 #include "WifiEvents.h"
-#include "config.h"
 #include "StorageManager.h"
 
 NetworkManager::NetworkManager()
@@ -46,7 +45,7 @@ void NetworkManager::tryConnect(){
             listener->wifiAp(ssid, info.status);
         }
     }); 
-    if(!wm.autoConnect(APName, APPassword)){ 
+    if(!wm.autoConnect(apInfo.APName.c_str(), apInfo.APPassword.c_str())){ 
         Serial.println("error de conexion"); 
         ESP.restart(); 
     } 

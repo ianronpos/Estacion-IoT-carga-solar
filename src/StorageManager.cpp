@@ -145,6 +145,7 @@ void StorageManager::loop(){
             dataToSend() ? Serial.println("Datos enviados de forma correcta") : 
                 Serial.println("No se pudo enviar los datos"); 
         }
+        sendWatcher = false; 
     }
 }
 
@@ -157,9 +158,40 @@ void StorageManager::interruption(StorageManager* pThis){
     pThis->sendWatcher; 
 }
 
-//=================================================================================================================================================
-//TODO: Implementar cuando tenga idea de que se necesita para MQTT
-//=================================================================================================================================================
 bool StorageManager::loadDefaultConfig(){ 
+    File configFile = LittleFS.open("config.json", "r");  
+    
+    if(!configFile){ 
+        Serial.println("No se ha podido abrir el archivo"); 
+        return false; 
+    }
 
+    //Asignacion temporal documento Json
+    JsonDocument doc; 
+
+    //Deserilizar archivo json
+    DeserializationError error = deserializeJson(doc, configFile); 
+    
+    //Despues de leerlo se cierra, ahorramos recursos
+    configFile.close(); 
+
+    if(error){ 
+        Serial.println("Error al leer el archivo"); 
+        Serial.println(error.c_str()); 
+        return false; 
+    }
+
+    String server = doc["MQTT_SERVER"].as<String>(); 
+    int port = doc["MQTT_PORT"] | 1883; 
+    String user = doc["yanIoT"].as<String>(); 
+    String password = doc["MQTT_PASSWORD"].as<String>(); 
+    String topic = doc["Iot/test"].as<String>(); 
+    apInfo.APPassword = doc["AP_PASSWORD"].as<String>(); 
+    apInfo.APName = doc["ESPAP"].as<String>(); 
+
+    if(transmisor != nullptr){ 
+        transmisor->loadMqttConfig(server, port, user,  password, topic); 
+    }
+
+    return true; 
 }
