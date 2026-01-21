@@ -69,6 +69,14 @@ void MqttManager::loadMqttConfig(String server, int port, String user,  String p
     config.mqttTopic = topic; 
 }
 
+void MqttManager::checkConfig(){ 
+    Serial.println(config.mqttServer);
+    Serial.println(config.mqttPort);
+    Serial.println(config.mqttUser);
+    Serial.println(config.mqttPassword);
+    Serial.println(config.mqttTopic);
+}
+
 void MqttManager::interruption(MqttManager* pThis){ 
     pThis->mqttWatcher = true; 
 }

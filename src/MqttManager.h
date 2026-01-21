@@ -37,6 +37,7 @@ class MqttManager : public ITransmisor{
         bool publish(JsonDocument& doc) override; 
         void loop();
 
+        void checkConfig(); 
 }; 
 
 

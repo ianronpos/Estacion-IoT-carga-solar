@@ -7,6 +7,10 @@
 #include <Adafruit_INA219.h>
 #include <Ticker.h>
 
+
+//TODO: revisar si es necesaria al struct, mirar si comprar otro sensor, y hacer pruebas con la bateria en vez de con el panel
+//Para comprobar el funcionamiento correcto del sensor y evitar el error 
+//supuestamente al hacer "ina.takeMeasure()", sin encontrar el sensor ina
 struct Measures{ 
     float current_mA; 
     float loadVoltage; 
@@ -23,7 +27,7 @@ class  InaDriver{
         static void IRAM_ATTR  interruption(InaDriver* pThis); 
 
     public: 
-        InaDriver() = default; 
+        InaDriver(); 
         bool setup(); 
         void takeMeasure(); 
         float getPower();

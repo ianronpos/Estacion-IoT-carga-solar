@@ -1,6 +1,10 @@
 #include "inaDriver.h"
 #include <Adafruit_INA219.h>
 
+InaDriver::InaDriver(){
+    
+}
+
 bool InaDriver::setup(){ 
     InaWatcher = false; 
     ticker.attach(60, interruption, this); 

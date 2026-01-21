@@ -7,7 +7,7 @@ void StorageManager::setITransmisor(ITransmisor* i){
 }
 
 bool StorageManager::setup(){
-    ticker.attach(60, interruption, this); 
+    ticker.attach(12, interruption, this); 
     bool res = false; 
     if(!LittleFS.begin()){ //Si no se puede arrancar el sistema de archivos
         Serial.println("Error al arrancar el Sistema de archivos littleFS. Probando formateo..."); 
@@ -32,6 +32,8 @@ bool StorageManager::setup(){
             Serial.println("No se encontro el archivo de configuracion"); 
             loadDefaultConfig(); 
         }
+
+        loadDefaultConfig(); 
         res = true; 
     }
     return res; 
@@ -70,28 +72,37 @@ void StorageManager::saveMeasure(float potency, float voltage){
 }
 
 bool StorageManager::hasPendingData(){ 
-    file = LittleFS.open("/log.csv", "r"); 
+    
 
-    if(!file){ 
+    if(!LittleFS.exists("/log.csv")){ //Comprueba existencia  
         Serial.println("El archivo no existe"); 
-        file.close();
         return false; 
-    } else if(file.size() == 0){ 
+    } 
+    
+    File temp = LittleFS.open("/log.csv", "r"); 
+    if(!temp){ //Comprueba si se abrio 
+        Serial.println("El archivo no se pudo abrir"); 
+        return false; 
+    }
+
+    size_t size = temp.size();  //Guarda el valor del tamaño
+    temp.close();  //lo cierra
+
+    if(size == 0){  //esta vacio
         Serial.println("El archivo esta vacio"); 
-        file.close();
         return false; 
-    } else {
+    } else { 
         Serial.println("El archivo tiene contenido"); 
-        file.close();
         return true; 
-    }    
+    }
+
 }
 
 bool StorageManager::PrepareDataForUpload(){ 
     if(!hasPendingData()){ 
         return false; 
     } else { 
-        LittleFS.rename("/getApInfolog.csv", "/temp.csv"); 
+        LittleFS.rename("/log.csv", "/temp.csv"); 
         lastPosition = 0L; 
         return true; 
     }
@@ -136,12 +147,14 @@ bool StorageManager::dataToSend(){
 
     lastPosition  = file.position(); //obtiene el numero del ultimo byte leido
     file.close(); 
+    Serial.println("Archivo creado, enviando..."); 
     return transmisor->publish(doc); //manda  las medidas por mqtt 
 }
 
 void StorageManager::loop(){ 
     if(sendWatcher){ 
-        if(PrepareDataForUpload()){ 
+        if(PrepareDataForUpload()){
+            Serial.println("hay datos cargados");  
             dataToSend() ? Serial.println("Datos enviados de forma correcta") : 
                 Serial.println("No se pudo enviar los datos"); 
         }
@@ -155,7 +168,7 @@ ApInfo StorageManager::getApInfo(){
 
 
 void StorageManager::interruption(StorageManager* pThis){ 
-    pThis->sendWatcher; 
+    pThis->sendWatcher = true; 
 }
 
 bool StorageManager::loadDefaultConfig(){ 
@@ -183,15 +196,17 @@ bool StorageManager::loadDefaultConfig(){
 
     String server = doc["MQTT_SERVER"].as<String>(); 
     int port = doc["MQTT_PORT"] | 1883; 
-    String user = doc["yanIoT"].as<String>(); 
+    String user = doc["MQTT_USER"].as<String>(); 
     String password = doc["MQTT_PASSWORD"].as<String>(); 
-    String topic = doc["Iot/test"].as<String>(); 
+    String topic = doc["MQTT_TOPIC"].as<String>(); 
     apInfo.APPassword = doc["AP_PASSWORD"].as<String>(); 
     apInfo.APName = doc["ESPAP"].as<String>(); 
 
     if(transmisor != nullptr){ 
         transmisor->loadMqttConfig(server, port, user,  password, topic); 
+        Serial.println("Se ha llamado a mqtt"); 
     }
 
+    Serial.println("Se ha cargado la configuracion de forma correcta"); 
     return true; 
 }
