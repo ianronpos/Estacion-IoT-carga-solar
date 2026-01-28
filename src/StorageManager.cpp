@@ -58,15 +58,18 @@ bool StorageManager::format(){
 
 void StorageManager::saveMeasure(float potency, float voltage){
     //Abrimos el archivo en modo append, si no existe, se crea 
-    File file = LittleFS.open("/log.csv", "a"); 
+    File file = LittleFS.open("/log.csv", "a");
 
     if(!file) { //Si el archivo no se habre
         Serial.println("Error al abrir el archivo log.csv"); 
         return; 
     }
 
+    //Obtencion del timeStamp
+    time_t ts = time(nullptr); 
+
     //Guarda medicion
-    file.printf("%.2f,%.2f\n", potency, voltage); 
+    file.printf("%.2f,%.2f,%ld\n", potency, voltage, (long)ts); 
 
     file.close(); 
 }
@@ -108,47 +111,49 @@ bool StorageManager::PrepareDataForUpload(){
     }
 }
 
-String StorageManager::getNextLine(){ 
-    if(!file.available()){
-        Serial.println("El archivo no esta disponible"); 
-        finishDataUpload(); 
-        return String((char*)NULL);  ; 
-    } else { 
-        String linea = file.readStringUntil('\n'); 
-        linea.trim(); 
-        return linea; 
-    }
-}
-
 void StorageManager::finishDataUpload(){ 
     LittleFS.remove("/temp.csv"); 
 }
 
-bool StorageManager::dataToSend(){
+bool StorageManager::dataToSend(){ 
     file = LittleFS.open("/temp.csv", "r"); 
+    if(!file) return false; //No se pudo abrir el archivo 
+
     file.seek(lastPosition); // Abre desde la posicion incial
-    JsonDocument doc; //Crea el documento
 
-    JsonArray array = doc.to<JsonArray>(); //Se  define como array
 
-    for(int i = 0; i < 5; i++){ 
-        JsonObject measure = array.add<JsonObject>(); //crea un nuevo objeto dentro del array
+    while(file.available()){
+        JsonDocument doc; //Crea el documento
+        JsonArray array = doc.to<JsonArray>(); //Se  define como array
 
-        String linea = getNextLine(); //obtiene la siguiente linea
-        if(linea.equals("")){ 
-            finishDataUpload(); 
-            break;
-        }else{ 
-            int comaIndex = linea.indexOf(','); //obtiene la coma que separa los valores del csv
-            measure["v"] = linea.substring(0, comaIndex); //valor voltage
-            measure["p"] = linea.substring(comaIndex + 1); //valor potencia 
+        int i = 0; //indice para enviar datos cada 5 lecturas y no saturar la RAM 
+
+        while(i < 10){ 
+            String linea = file.readStringUntil('\n'); 
+            linea.trim(); 
+
+            if(linea.length() > 0){ 
+                int comaIndex1 = linea.indexOf(','); 
+                int comaIndex2 = linea.indexOf(',', comaIndex1 + 1); 
+                JsonObject measure = array.add<JsonObject>(); //crea un nuevo objeto dentro del array
+                
+                measure["v"] = linea.substring(0, comaIndex1); //valor voltage
+                measure["p"] = linea.substring(comaIndex1 + 1, comaIndex2); //valor potencia 
+                measure["timeStamp"] = linea.substring(comaIndex2 + 1); 
+                i++; 
+            }
+        }
+
+        if(i > 0){ 
+            Serial.println("Enviando bloque de datos"); 
+            transmisor->publish(doc);
+            yield(); 
         }
     }
 
-    lastPosition  = file.position(); //obtiene el numero del ultimo byte leido
     file.close(); 
-    Serial.println("Archivo creado, enviando..."); 
-    return transmisor->publish(doc); //manda  las medidas por mqtt 
+    finishDataUpload(); 
+    return  true; 
 }
 
 void StorageManager::loop(){ 

@@ -27,15 +27,17 @@ class MqttManager : public ITransmisor{
 
         static void IRAM_ATTR interruption(MqttManager* pThis);
 
+        //Implementar metodo que devuelva el stado de la conexion mqtt
     public: 
         MqttManager();  
         void setup(); 
         void reconnect(); 
         bool isConnected(); 
-        int8_t getConnectionStatus(); 
+        int8_t getConnectionStatus() override; 
         void loadMqttConfig(String server, int port, String user,  String password, String topic) override; 
         bool publish(JsonDocument& doc) override; 
         void loop();
+
 
         void checkConfig(); 
 }; 

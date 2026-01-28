@@ -23,16 +23,19 @@ class  InaDriver{
         Adafruit_INA219 ina219; 
         Ticker ticker; 
         volatile bool InaWatcher; 
+        bool saveMeasure;  
 
         static void IRAM_ATTR  interruption(InaDriver* pThis); 
 
     public: 
-        InaDriver(); 
+        InaDriver() = default;
         bool setup(); 
         void takeMeasure(); 
         float getPower();
         float getVoltage();  
         void loop(); 
+        bool getSaveMeasure(); 
+        void setMeasure(bool b);
 }; 
 
 #endif

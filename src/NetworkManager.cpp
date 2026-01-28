@@ -31,7 +31,7 @@ void NetworkManager::setup(const ApInfo& apInfo){
     this->apInfo = apInfo; 
 }  
 
-void NetworkManager::tryConnect(){ 
+bool NetworkManager::tryConnect(){ 
     Serial.println("Intento de conexion"); 
    
     WiFiManager wm; 
@@ -48,6 +48,10 @@ void NetworkManager::tryConnect(){
     if(!wm.autoConnect(apInfo.APName.c_str(), apInfo.APPassword.c_str())){ 
         Serial.println("error de conexion"); 
         ESP.restart(); 
+        return false;         
+    } else {
+        Serial.println("Wifi conectado"); 
+        return true; 
     } 
 }
 

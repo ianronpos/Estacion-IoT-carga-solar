@@ -31,7 +31,7 @@ class NetworkManager {
         NetworkManager();  
         void setListner(WifiEvents* listener);        
         void setup(const ApInfo& apInfo);
-        void tryConnect(); 
+        bool tryConnect(); 
         void scan(); 
         void loop(); 
         
