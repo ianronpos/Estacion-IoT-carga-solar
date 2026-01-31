@@ -136,10 +136,12 @@ bool StorageManager::dataToSend(){
                 int comaIndex2 = linea.indexOf(',', comaIndex1 + 1); 
                 JsonObject measure = array.add<JsonObject>(); //crea un nuevo objeto dentro del array
                 
-                measure["p"] = linea.substring(comaIndex1 + 1, comaIndex2); //valor potencia 
-                measure["v"] = linea.substring(0, comaIndex1); //valor voltage
-                measure["timeStamp"] = linea.substring(comaIndex2 + 1); 
+                measure["p"] = linea.substring(0, comaIndex1).toFloat(); //valor voltage
+                measure["v"] = linea.substring(comaIndex1 + 1, comaIndex2).toFloat(); //valor potencia 
+                measure["timeStamp"] = linea.substring(comaIndex2 + 1).toInt(); 
                 i++; 
+
+                Serial.println(linea); 
             }
         }
 

@@ -8,7 +8,7 @@
 #include <Adafruit_SSD1306.h>
 #include <time.h>
  
-DisplayManager displayManager; 
+//DisplayManager displayManager;
 NetworkManager wifi;
 StorageManager storage; 
 MqttManager mqtt; 
@@ -21,14 +21,14 @@ void setup() {
   Serial.begin(115200); 
 
   if(!ina.setup()){ 
-    displayManager.displayText("Error al encontrar el sensor INA219"); 
+    //displayManager.displayText("Error al encontrar el sensor INA219"); 
     while (true) {}
   }
   Serial.println("ina conectado");
 
-  wifi.setListner(&displayManager); //Tiene que llamarse antes que el wifi.setup() ya que este crea eventos con el listener 
+//  wifi.setListner(&displayManager); //Tiene que llamarse antes que el wifi.setup() ya que este crea eventos con el listener 
   storage.setITransmisor(&mqtt); 
-  displayManager.setup(); 
+  //displayManager.setup(); 
   wifi.setup(storage.getApInfo()); 
   storage.setup(); 
   if(wifi.tryConnect()) configTime(TZ_INFO, "pool.ntp.org", "time.google.com"); 
