@@ -49,5 +49,6 @@ void loop() {
     storage.saveMeasure(ina.getPower(), ina.getVoltage()); 
     ina.setMeasure(false); 
   }
+  storage.loop();
   delay(50);
 }

@@ -7,7 +7,7 @@ void StorageManager::setITransmisor(ITransmisor* i){
 }
 
 bool StorageManager::setup(){
-    ticker.attach(12, interruption, this); 
+    ticker.attach(1, interruption, this); 
     bool res = false; 
     if(!LittleFS.begin()){ //Si no se puede arrancar el sistema de archivos
         Serial.println("Error al arrancar el Sistema de archivos littleFS. Probando formateo..."); 
@@ -75,8 +75,6 @@ void StorageManager::saveMeasure(float potency, float voltage){
 }
 
 bool StorageManager::hasPendingData(){ 
-    
-
     if(!LittleFS.exists("/log.csv")){ //Comprueba existencia  
         Serial.println("El archivo no existe"); 
         return false; 
@@ -105,6 +103,7 @@ bool StorageManager::PrepareDataForUpload(){
     if(!hasPendingData()){ 
         return false; 
     } else { 
+        Serial.println("Info preparada para enviar");
         LittleFS.rename("/log.csv", "/temp.csv"); 
         lastPosition = 0L; 
         return true; 
@@ -128,7 +127,7 @@ bool StorageManager::dataToSend(){
 
         int i = 0; //indice para enviar datos cada 5 lecturas y no saturar la RAM 
 
-        while(i < 10){ 
+        while(i < 10 && file.available()){ 
             String linea = file.readStringUntil('\n'); 
             linea.trim(); 
 
@@ -137,8 +136,8 @@ bool StorageManager::dataToSend(){
                 int comaIndex2 = linea.indexOf(',', comaIndex1 + 1); 
                 JsonObject measure = array.add<JsonObject>(); //crea un nuevo objeto dentro del array
                 
-                measure["v"] = linea.substring(0, comaIndex1); //valor voltage
                 measure["p"] = linea.substring(comaIndex1 + 1, comaIndex2); //valor potencia 
+                measure["v"] = linea.substring(0, comaIndex1); //valor voltage
                 measure["timeStamp"] = linea.substring(comaIndex2 + 1); 
                 i++; 
             }

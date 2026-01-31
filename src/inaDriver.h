@@ -19,8 +19,12 @@ struct Measures{
 
 class  InaDriver{ 
     private:
-        Measures measures; 
-        Adafruit_INA219 ina219; 
+        float shuntvoltage;
+        float busvoltage;
+        float current_mA;
+        float loadvoltage;
+        float power_mW;
+        Adafruit_INA219 ina219;
         Ticker ticker; 
         volatile bool InaWatcher; 
         bool saveMeasure;  

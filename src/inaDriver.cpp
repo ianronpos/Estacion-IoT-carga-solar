@@ -4,9 +4,7 @@
 
 bool InaDriver::setup(){ 
     InaWatcher = false; 
-    ticker.attach(60, interruption, this); 
-
-    Wire.begin(D2, D1); 
+    ticker.attach(1, interruption, this); 
 
     if(!ina219.begin()){
         Serial.println("Failed to find INA219");
@@ -15,18 +13,24 @@ bool InaDriver::setup(){
 }
 
 void InaDriver::takeMeasure(){
-    measures.current_mA = ina219.getCurrent_mA(); 
-    measures.loadVoltage = ina219.getBusVoltage_V() + ina219.getShuntVoltage_mV() /1000; 
-    measures.potency_mW = measures.loadVoltage * measures.current_mA; 
+     shuntvoltage = ina219.getShuntVoltage_mV();
+    busvoltage = ina219.getBusVoltage_V();
+    current_mA = ina219.getCurrent_mA();
+    power_mW = ina219.getPower_mW();
+    loadvoltage = busvoltage + (shuntvoltage / 1000);
     saveMeasure = true; 
+    Serial.print("tension: "); 
+    Serial.print(loadvoltage);
+    Serial.print("  Intensidad: "); 
+    Serial.println(current_mA);
 }
 
 float InaDriver::getPower(){ 
-    return measures.potency_mW; 
+    return power_mW; 
 }
 
 float InaDriver::getVoltage(){ 
-    return measures.loadVoltage; 
+    return loadvoltage; 
 }
 
 void InaDriver::loop(){ 

@@ -56,6 +56,7 @@ void MqttManager::loop(){
             }
         } else{ 
             client.loop(); //Mantiene activa la conexion
+            Serial.println("Conexion actualizada");
         }
         mqttWatcher = false;
     }
