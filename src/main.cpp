@@ -31,7 +31,7 @@ void setup() {
   //displayManager.setup(); 
   wifi.setup(storage.getApInfo()); 
   storage.setup(); 
-  if(wifi.tryConnect()) configTime(TZ_INFO, "pool.ntp.org", "time.google.com"); 
+  if(wifi.tryConnect(180)) configTime(TZ_INFO, "pool.ntp.org", "time.google.com"); 
   Serial.print("Sincronizando la hora."); 
   while(time(nullptr) < 1000000){ 
     delay(500); 

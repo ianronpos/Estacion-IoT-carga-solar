@@ -1,8 +1,9 @@
+#include "WifiEvents.h"
+#include "StorageManager.h"
 #include "NetworkManager.h"
 #include <ESP8266WiFi.h>
 #include <EEPROM.h>
-#include "WifiEvents.h"
-#include "StorageManager.h"
+#include <Ticker.h>
 
 NetworkManager::NetworkManager()
     : listener(nullptr), credentialsValid(false) {
@@ -31,11 +32,11 @@ void NetworkManager::setup(const ApInfo& apInfo){
     this->apInfo = apInfo; 
 }  
 
-bool NetworkManager::tryConnect(){ 
+bool NetworkManager::tryConnect(int timeout){ 
     Serial.println("Intento de conexion"); 
    
     WiFiManager wm; 
-    wm.setConfigPortalTimeout(APTimeout); 
+    wm.setConfigPortalTimeout(timeout); 
     wm.setAPCallback([this] (WiFiManager *mywm){
         Serial.println("Entrando en modo AP"); 
         
@@ -47,7 +48,6 @@ bool NetworkManager::tryConnect(){
     }); 
     if(!wm.autoConnect(apInfo.APName.c_str(), apInfo.APPassword.c_str())){ 
         Serial.println("error de conexion"); 
-        ESP.restart(); 
         return false;         
     } else {
         Serial.println("Wifi conectado"); 
@@ -68,17 +68,17 @@ void NetworkManager::loop() {
 
             case WL_DISCONNECTED: //Codigo 7
             listener->onWifiDisconnect(info); 
-            tryConnect();
+            if(reconnectTicker) tryConnect();
             break;
 
             case WL_WRONG_PASSWORD: //Codigo 6
             listener->onWifiDisconnect(info); 
-            tryConnect(); 
+            if(reconnectTicker) tryConnect();
             break;    
             
             case WL_NO_SSID_AVAIL: //Codigo 1
             listener->onWifiDisconnect(info); 
-            tryConnect(); 
+            if(reconnectTicker) tryConnect();
             break; 
 
             default: 
@@ -94,4 +94,8 @@ uint8_t NetworkManager::getStatus() const {
 void NetworkManager::updateState(){ 
     info.status = WiFi.status(); 
     Serial.println(WiFi.status());
+}
+
+void NetworkManager::reconnect(NetworkManager* pThis){ 
+    pThis->reconnectTicker = true; 
 }

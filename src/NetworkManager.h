@@ -13,7 +13,6 @@
 
 class NetworkManager { 
     private: 
-        static constexpr int APTimeout = 180; 
         WifiEvents* listener; 
         WifiInfo info; 
         bool credentialsValid; 
@@ -21,17 +20,20 @@ class NetworkManager {
         char password [65];
         wl_status_t status; 
         ApInfo apInfo; 
+        volatile bool reconnectTicker; 
 
         //Event Handlers 
         WiFiEventHandler gotIpEventHandler;
         WiFiEventHandler disconnetedEventHandler; 
         WiFiEventHandler connectedEventHandler; 
 
+        static void IRAM_ATTR reconnect(NetworkManager* pThis); 
+
     public: 
         NetworkManager();  
         void setListner(WifiEvents* listener);        
         void setup(const ApInfo& apInfo);
-        bool tryConnect(); 
+        bool tryConnect(int timeout = 120); 
         void scan(); 
         void loop(); 
         
